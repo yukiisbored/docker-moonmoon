@@ -1,0 +1,30 @@
+# Docker Compose setup for moonmoon
+# This is a basic PHP + Nginx stack with Docker containers
+#
+# If you're planning to use a nginx server on host:
+# - Copy or create your own nginx configuration (see nginx/conf.d/moonmoon.conf)
+# - Change the 'root' variable of the nginx configuration
+# - Replace the target volume for the php volume
+# - Remove the whole nginx section
+# - Expose port 9000 for the php container (make sure it only listens on 127.0.0.1)
+# - Modify the nginx config to use the php container's fpm 
+
+version: '2.0'
+services:
+  php:
+    image: php:7-fpm-alpine
+    volumes:
+    - ./moonmoon:/webroot
+  nginx:
+    image: nginx:latest
+    depends_on:
+    - php
+    ports:
+    - "8000:80"
+    volumes:
+    - ./nginx/conf.d:/etc/nginx/conf.d
+    - ./moonmoon:/webroot
+    environment:
+    - NGINX_PORT=80
+    links:
+    - php
